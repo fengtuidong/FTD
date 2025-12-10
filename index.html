@@ -1,0 +1,1799 @@
+<html lang="zh-CN"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文昌水投充电桩预约</title>
+    <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- 统一的 Tailwind 配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#000000',
+                        secondary: '#666666',
+                        accent: '#f97316',
+                        success: '#22c55e',
+                        white: '#ffffff',
+                        'gray-light': '#f5f5f5',
+                        'gray-lighter': '#fafafa',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+                        'card-hover': '0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .glass-effect {
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                border: 1px solid rgba(0, 0, 0, 0.05);
+            }
+            .transition-all-300 {
+                transition: all 0.3s ease;
+            }
+            .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+            }
+            .scrollbar-hide {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            .hover-scale {
+                transition: transform 0.3s ease;
+            }
+            .hover-scale:hover {
+                transform: scale(1.02);
+            }
+        }
+    </style>
+    <style>
+        body {
+            background-color: #ffffff;
+            color: #000000;
+            font-family: 'Inter', system-ui, sans-serif;
+            overflow-x: hidden;
+        }
+        
+        /* 打字效果 */
+        .typing::after {
+            content: '|';
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #fff;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #ddd;
+            border-radius: 3px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #bbb;
+        }
+        
+        /* 自定义鼠标跟随 */
+        .custom-cursor {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 1px solid #000;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s, opacity 0.3s, background-color 0.3s;
+            mix-blend-mode: difference;
+        }
+        
+        .custom-cursor.hover {
+            width: 64px;
+            height: 64px;
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+        
+        /* 渐入动画 */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* 预约卡片悬停效果 */
+        .appointment-card {
+            transition: all 0.3s ease;
+        }
+        
+        .appointment-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+        }
+        
+        /* 按钮悬停效果 */
+        .btn-hover {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-hover::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.05), transparent);
+            transition: all 0.6s ease;
+        }
+        
+        .btn-hover:hover::before {
+            left: 100%;
+        }
+        
+        /* 状态指示器动画 */
+        .status-pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(34, 197, 94, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+            }
+        }
+        
+        .status-pulse.occupied {
+            animation: pulse-orange 2s infinite;
+        }
+        
+        @keyframes pulse-orange {
+            0% {
+                box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(249, 115, 22, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(249, 115, 22, 0);
+            }
+        }
+        
+        /* 时间段悬停效果 */
+        .time-slot {
+            transition: all 0.3s ease;
+        }
+        
+        .time-slot:hover {
+            transform: scale(1.05);
+        }
+        
+        /* 模态框动画 */
+        .modal-content {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* 通知动画 */
+        .notification {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* 滚动差分效果 */
+        .screen {
+            position: relative;
+            min-height: 100vh;
+            transition: transform 0.1s ease-out;
+        }
+        
+        /* 线条元素 */
+        .line-element {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .line-element::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background-color: #000;
+            transition: width 0.3s ease;
+        }
+        
+        .line-element:hover::after {
+            width: 100%;
+        }
+        
+        /* 几何装饰线条 */
+        .geometric-lines {
+            position: absolute;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .geometric-lines .horizontal {
+            position: absolute;
+            height: 1px;
+            background-color: rgba(0, 0, 0, 0.08);
+        }
+        
+        .geometric-lines .vertical {
+            position: absolute;
+            width: 1px;
+            background-color: rgba(0, 0, 0, 0.08);
+        }
+        
+        .geometric-lines .diagonal {
+            position: absolute;
+            width: 1px;
+            background-color: rgba(0, 0, 0, 0.05);
+            transform-origin: top left;
+        }
+    </style>
+</head>
+<body>
+    <!-- 自定义鼠标跟随 -->
+    <div id="custom-cursor" class="custom-cursor opacity-0"></div>
+    
+    <!-- 几何装饰线条 -->
+    <div class="geometric-lines">
+        <div class="horizontal top-1/4 left-0 w-full"></div>
+        <div class="horizontal top-2/4 left-0 w-full"></div>
+        <div class="horizontal top-3/4 left-0 w-full"></div>
+        <div class="vertical top-0 left-1/4 h-full"></div>
+        <div class="vertical top-0 left-2/4 h-full"></div>
+        <div class="vertical top-0 left-3/4 h-full"></div>
+        <div class="diagonal top-0 right-0 w-64 h-64 rotate-45"></div>
+        <div class="diagonal bottom-0 left-0 w-64 h-64 rotate-45"></div>
+    </div>
+    
+    <!-- 第一屏：头部和状态概览 -->
+    <section id="screen3" class="screen relative min-h-screen bg-white z-5">
+        <div class="relative z-5 min-h-screen px-4 md:px-8">
+            <div class="max-w-6xl mx-12">
+                <!-- 顶部标题区域 -->
+                <header class="mb-16 pt-16">
+                    <div class="flex flex-col items-center text-center mb-12">
+                        <h1 class="text-3xl md:text-4xl font-light mb-3">
+                            充电桩
+                            <span id="typing-text" class="typing ml-3" style="font-size: 12px;">预约系统</span>
+                        </h1>
+                        <div class="line-element h-px w-12 bg-black mb-6"></div>
+                        <p></p>
+                    </div>
+                </header>
+                
+                <!-- 充电桩状态概览卡片 -->
+                <div class="glass-effect rounded-xl p-8 mb-8 hover-scale fade-in shadow-card">
+                    <div class="flex flex-col md:flex-row justify-between items-center">
+                        <div>
+                            <h2 class="text-3xl md:text-4xl font-light mb-6">当前状态</h2>
+                            <div class="flex items-center">
+                                <div id="status-indicator" class="w-5 h-5 rounded-full bg-success mr-4 status-pulse"></div>
+                                <span id="status-text" class="text-2xl font-light text-success">当前可用</span>
+                            </div>
+                        </div>
+                        <div class="mt-8 md:mt-0 text-center md:text-right">
+                            <p class="text-secondary mb-3">预计下次可用时间</p>
+                            <p id="next-available-time" class="text-3xl font-light">现在</p>                   
+        </div>        
+    </div></div></div>
+                    <!-- 日期选择器 -->
+                    <div class="flex justify-center items-center mb-16 fade-in" style="transition-delay: 0.2s;">
+                    <button id="prev-day" class="p-4 rounded-full hover:bg-gray-100 transition-all-150">
+                        <i class="fa fa-chevron-left text-primary"></i>
+                    </button>
+                    <span id="current-date" class="text-2xl font-light mx-8">2025年12月9日星期二</span>
+                    <button id="next-day" class="p-4 rounded-full hover:bg-gray-100 transition-all-150">
+                        <i class="fa fa-chevron-right text-primary"></i>
+                    </button>
+                </div>
+   </section>
+    
+    <!-- 第二屏：日期选择和时间段 -->
+    <section id="screen2" class="screen relative min-h-screen bg-gray-lighter z-5">
+        <div class="relative z-5 min-h-screen px-2 md:px-8 py-8">
+            <div class="max-w-6xl mx-50">
+                     
+                <!-- 时间段选择器 -->
+                <div class="glass-effect rounded-xl p-8 mb-16 fade-in shadow-card" style="transition-delay: 0.3s;">
+                    <h2 class="text-3xl font-light mb-10">预约时间表</h2>
+                                                                        
+                                <!-- 时间段行 - 员工列表 -->
+                                <div id="employee-time-slots">
+                                    <!-- 员工时间段将通过JS动态生成 -->
+                                </div>
+                            </div>
+                        </div>
+                    </div
+                <div class="glass-effect rounded-xl p-8 mb-16 fade-in shadow-card" style="transition-delay: 0.3s;">
+                    <h2 class="text-3xl font-light mb-10">预约时间表</h2>
+                                                                        
+                                <!-- 时间段行 - 员工列表 -->
+                                <div id="employee-time-slots">
+                                    <!-- 员工时间段将通过JS动态生成 -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                
+            
+        
+    </section>
+    
+    <!-- 第三屏：预约列表和添加按钮 -->
+    <section id="screen3" class="screen relative min-h-screen bg-white z-30">
+        <div class="relative z-10 min-h-screen px-4 md:px-8 py-16">
+            <div class="max-w-6xl mx-auto">
+                <!-- 今日预约列表 -->
+                <div class="glass-effect rounded-xl p-8 mb-16 fade-in shadow-card" style="transition-delay: 0.4s;">
+                    <div class="flex justify-between items-center mb-10">
+                        <h2 class="text-3xl font-light">今日预约</h2>
+                        <div class="line-element h-px w-32 bg-black"></div>
+                    </div>
+                    
+                    <div id="appointment-list" class="space-y-4">
+                        <!-- 预约项会通过JS动态生成 -->
+                    </div>
+                </div>
+                
+                <!-- 添加预约按钮 -->
+                <div class="flex justify-center mb-16 fade-in" style="transition-delay: 0.5s;">
+                    <button id="add-appointment-btn" class="btn-hover bg-black text-white font-light py-4 px-12 rounded-full transition-all-300 flex items-center hover:bg-gray-800">
+                        <i class="fa fa-plus mr-4"></i>
+                        添加预约
+                    </button>
+                </div>
+                
+                <!-- 充电记录统计 -->
+                <div class="glass-effect rounded-xl p-8 mb-16 fade-in shadow-card" style="transition-delay: 0.6s;">
+                    <div class="flex justify-between items-center mb-10">
+                        <h2 class="text-3xl font-light">充电记录</h2>
+                        <div class="flex space-x-4">
+                            <button id="refresh-stats-btn" class="p-3 rounded-full hover:bg-gray-100 transition-all-300">
+                                <i class="fa fa-refresh text-primary"></i>
+                            </button>
+                            <button id="manage-users-btn" class="p-3 rounded-full hover:bg-gray-100 transition-all-300">
+                                <i class="fa fa-users text-primary"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="stats-container" class="space-y-6">
+                        <!-- 统计数据将通过JS动态生成 -->
+                    </div>
+                </div>
+                
+                <!-- 页脚 -->
+                <footer class="text-center text-secondary text-sm py-12 fade-in" style="transition-delay: 0.7s;">
+                    <div class="line-element h-px w-16 bg-black mx-auto mb-6"></div>
+                    <p>© 2025 文昌水投充电桩预约 | 白色极简设计</p>
+                </footer>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 添加/编辑预约模态框 -->
+    <div id="appointment-modal" class="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+        <div class="glass-effect rounded-xl p-10 w-full max-w-md mx-4 transform transition-all-300 scale-95 opacity-0 shadow-lg" id="modal-content">
+            <div class="flex justify-between items-center mb-10">
+                <h3 id="modal-title" class="text-2xl font-light">添加预约</h3>
+                <button id="close-modal" class="text-secondary hover:text-primary transition-all-300">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <form id="appointment-form">
+                <input type="hidden" id="appointment-id">
+                
+                <div class="mb-8">
+                    <label for="user-name" class="block text-sm font-light text-secondary mb-3">使用者</label>
+                    <select id="user-name" class="w-full px-5 py-4 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-primary text-primary">
+                        <!-- 员工选项将通过JS动态生成 -->
+                    </select>
+                </div>
+                
+                <div class="mb-8">
+                    <label for="charging-station" class="block text-sm font-light text-secondary mb-3">充电桩</label>
+                    <select id="charging-station" class="w-full px-5 py-4 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-primary text-primary">
+                        <option value="byd">比亚迪充电桩</option>
+                        <option value="leap">零跑充电桩</option>
+                    </select>
+                </div>
+                
+                <div class="mb-8">
+                    <label for="appointment-date" class="block text-sm font-light text-secondary mb-3">日期</label>
+                    <input type="date" id="appointment-date" class="w-full px-5 py-4 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-primary text-primary">
+                </div>
+                
+                <div class="grid grid-cols-2 gap-8 mb-10">
+                    <div>
+                        <label for="start-time" class="block text-sm font-light text-secondary mb-3">开始时间</label>
+                        <select id="start-time" class="w-full px-5 py-4 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-primary text-primary">
+                            <!-- 10分钟间隔的时间选项将通过JS动态生成 -->
+                        </select>
+                    </div>
+                    <div>
+                        <label for="end-time" class="block text-sm font-light text-secondary mb-3">结束时间</label>
+                        <select id="end-time" class="w-full px-5 py-4 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-primary text-primary">
+                            <!-- 10分钟间隔的时间选项将通过JS动态生成 -->
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-4">
+                    <button type="button" id="cancel-appointment" class="px-8 py-4 border border-gray-300 rounded-lg text-primary hover:bg-gray-50 transition-all-300">取消</button>
+                    <button type="submit" id="save-appointment" class="px-8 py-4 bg-black text-white rounded-lg hover:bg-gray-800 transition-all-300">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- 冲突提醒模态框 -->
+    <div id="conflict-modal" class="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+        <div class="glass-effect rounded-xl p-10 w-full max-w-md mx-4 transform transition-all-300 scale-95 opacity-0 shadow-lg" id="conflict-modal-content">
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="text-2xl font-light">预约冲突</h3>
+                <button id="close-conflict-modal" class="text-secondary hover:text-primary transition-all-300">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="mb-8">
+                <p class="text-secondary mb-6">您选择的时间段已被预约，以下是可用的时间段：</p>
+                <div id="available-slots" class="space-y-4">
+                    <!-- 可用时间段将在这里动态生成 -->
+                </div>
+            </div>
+            
+            <div class="flex justify-end">
+                <button id="close-conflict" class="px-8 py-4 bg-black text-white rounded-lg hover:bg-gray-800 transition-all-300">我知道了</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 用户管理模态框 -->
+    <div id="user-management-modal" class="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+        <div class="glass-effect rounded-xl p-10 w-full max-w-md mx-4 transform transition-all-300 scale-95 opacity-0 shadow-lg" id="user-management-content">
+            <div class="flex justify-between items-center mb-10">
+                <h3 class="text-2xl font-light">用户管理</h3>
+                <button id="close-user-management-modal" class="text-secondary hover:text-primary transition-all-300">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="mb-8">
+                <label for="new-user-name" class="block text-sm font-light text-secondary mb-3">添加新用户</label>
+                <div class="flex space-x-4">
+                    <input type="text" id="new-user-name" class="flex-1 px-5 py-4 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-primary text-primary" placeholder="输入用户名">
+                    <button id="add-user-btn" class="px-6 py-4 bg-black text-white rounded-lg hover:bg-gray-800 transition-all-300">添加</button>
+                </div>
+            </div>
+            
+            <div class="mb-8">
+                <h4 class="text-lg font-light mb-4">当前用户列表</h4>
+                <div id="user-list" class="space-y-3 max-h-60 overflow-y-auto">
+                    <!-- 用户列表将通过JS动态生成 -->
+                </div>
+            </div>
+            
+            <div class="flex justify-end">
+                <button id="close-user-management" class="px-8 py-4 bg-black text-white rounded-lg hover:bg-gray-800 transition-all-300">关闭</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 通知提示 -->
+    <div id="notification" class="fixed top-8 right-8 z-50 px-8 py-4 rounded-lg glass-effect transform translate-x-full transition-transform duration-300 opacity-0 shadow-lg">
+        <div class="flex items-center">
+            <i id="notification-icon" class="fa fa-check-circle mr-4 text-success"></i>
+            <span id="notification-message">操作成功</span>
+        </div>
+    </div>
+    
+    <script>
+        // 生成10分钟间隔的时间槽（24小时制）
+        function generateTimeSlots() {
+            const slots = [];
+            for (let hour = 0; hour < 24; hour++) {
+                for (let minute = 0; minute < 60; minute += 10) {
+                    const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+                    slots.push(timeString);
+                }
+            }
+            return slots;
+        }
+        
+        // 全局配置
+        const CONFIG = {
+            timeSlots: generateTimeSlots(),
+            storageKey: 'charging_appointments_white'
+        };
+        
+        // 用户管理
+        const userManager = {
+            // 获取所有用户
+            getUsers() {
+                const data = storageService.loadData();
+                return data.users || ['比亚迪', '零跑', '员工'];
+            },
+            
+            // 添加用户
+            addUser(userName) {
+                const data = storageService.loadData();
+                data.users = data.users || ['默认用户'];
+                
+                if (!data.users.includes(userName)) {
+                    data.users.push(userName);
+                    storageService.saveData(data);
+                    return true;
+                }
+                return false;
+            },
+            
+            // 删除用户
+            removeUser(userName) {
+                const data = storageService.loadData();
+                data.users = data.users || ['比亚迪', '零跑', '员工'];
+                
+                // 不允许删除默认的三个用户
+                const defaultUsers = ['比亚迪', '零跑', '员工'];
+                if (defaultUsers.includes(userName)) {
+                    return false;
+                }
+                
+                if (data.users.includes(userName)) {
+                    data.users = data.users.filter(user => user !== userName);
+                    storageService.saveData(data);
+                    return true;
+                }
+                return false;
+            },
+            
+            // 获取所有用户预约统计
+            getUserStats() {
+                const data = storageService.loadData();
+                const appointments = data.appointments || [];
+                const stats = {};
+                
+                appointments.forEach(app => {
+                    if (!stats[app.user]) {
+                        stats[app.user] = {
+                            total: 0,
+                            duration: 0,
+                            lastUsed: null
+                        };
+                    }
+                    
+                    stats[app.user].total++;
+                    
+                    const startHour = parseInt(app.startTime.split(':')[0]);
+                    const endHour = parseInt(app.endTime.split(':')[0]);
+                    stats[app.user].duration += (endHour - startHour);
+                    
+                    if (!stats[app.user].lastUsed || app.date > stats[app.user].lastUsed) {
+                        stats[app.user].lastUsed = app.date;
+                    }
+                });
+                
+                return stats;
+            }
+        };
+        
+        // 全局变量
+        let appointments = [];
+        let currentDate = new Date();
+        let lastUpdated = Date.now();
+        
+        // 打字效果
+        const typingEffect = (element, words, typingSpeed = 100, pauseTime = 1000) => {
+            let wordIndex = 0;
+            let charIndex = 0;
+            let isDeleting = false;
+          
+            function type() {
+                const currentWord = words[wordIndex];
+              
+                if (isDeleting) {
+                    // 删除字符
+                    element.textContent = currentWord.substring(0, charIndex - 1);
+                    charIndex--;
+                } else {
+                    // 添加字符
+                    element.textContent = currentWord.substring(0, charIndex + 1);
+                    charIndex++;
+                }
+              
+                // 处理删除/添加状态转换
+                if (!isDeleting && charIndex === currentWord.length) {
+                    isDeleting = true;
+                    setTimeout(type, pauseTime); // 完成单词后暂停
+                } else if (isDeleting && charIndex === 0) {
+                    isDeleting = false;
+                    wordIndex = (wordIndex + 1) % words.length; // 循环切换单词
+                    setTimeout(type, 200); // 短暂暂停后开始新单词
+                } else {
+                    // 继续当前操作
+                    setTimeout(type, isDeleting ? typingSpeed/2 : typingSpeed);
+                }
+            }
+          
+            type(); // 启动动画
+        };
+        
+        // 自定义鼠标跟随效果
+        const setupCustomCursor = () => {
+            const cursor = document.getElementById('custom-cursor');
+            let mouseX = 0, mouseY = 0;
+            let cursorX = 0, cursorY = 0;
+            let speed = 0.2;
+            
+            // 显示光标
+            document.addEventListener('mousemove', (e) => {
+                cursor.style.opacity = '1';
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            });
+            
+            // 平滑跟随
+            function animateCursor() {
+                cursorX += (mouseX - cursorX) * speed;
+                cursorY += (mouseY - cursorY) * speed;
+                
+                cursor.style.transform = `translate(${cursorX}px, ${cursorY}px)`;
+                
+                requestAnimationFrame(animateCursor);
+            }
+            
+            animateCursor();
+            
+            // 悬停效果
+            const hoverElements = document.querySelectorAll('button, .time-slot, .appointment-card');
+            hoverElements.forEach(element => {
+                element.addEventListener('mouseenter', () => {
+                    cursor.classList.add('hover');
+                });
+                
+                element.addEventListener('mouseleave', () => {
+                    cursor.classList.remove('hover');
+                });
+            });
+        };
+        
+        // 滚动差分效果
+        const setupScrollParallax = () => {
+            const screens = document.querySelectorAll('.screen');
+            
+            window.addEventListener('scroll', () => {
+                const scrollY = window.scrollY;
+                const windowHeight = window.innerHeight;
+                
+                // 第一屏和第二屏的过渡
+                if (scrollY < windowHeight) {
+                    const progress = Math.min(1, scrollY / windowHeight);
+                    const translateY = -200 * (1 - progress);
+                    screens[1].style.transform = `translateY(${translateY}px)`;
+                }
+                
+                // 第二屏和第三屏的过渡
+                if (scrollY >= windowHeight && scrollY < windowHeight * 2) {
+                    const progress = Math.min(1, (scrollY - windowHeight) / windowHeight);
+                    const translateY = 200 * progress;
+                    screens[1].style.transform = `translateY(${translateY}px)`;
+                    screens[2].style.transform = `translateY(${-100 * (1 - progress)}px)`;
+                }
+                
+                // 第三屏完全显示
+                if (scrollY >= windowHeight * 2) {
+                    screens[2].style.transform = `translateY(0)`;
+                }
+            });
+        };
+        
+        // 滚动渐入效果
+        const setupScrollReveal = () => {
+            const revealElements = document.querySelectorAll('.fade-in');
+            
+            const revealOnScroll = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        revealOnScroll.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            });
+            
+            revealElements.forEach(element => {
+                revealOnScroll.observe(element);
+            });
+        };
+        
+        // 本地存储服务
+        const storageService = {
+            saveData(data) {
+                try {
+                    localStorage.setItem(CONFIG.storageKey, JSON.stringify(data));
+                    return true;
+                } catch (error) {
+                    console.error('保存数据失败:', error);
+                    return false;
+                }
+            },
+            
+            loadData() {
+                try {
+                    const data = localStorage.getItem(CONFIG.storageKey);
+                    return data ? JSON.parse(data) : { appointments: [], settings: {} };
+                } catch (error) {
+                    console.error('读取数据失败:', error);
+                    return { appointments: [], settings: {} };
+                }
+            },
+            
+            clearData() {
+                try {
+                    localStorage.removeItem(CONFIG.storageKey);
+                    return true;
+                } catch (error) {
+                    console.error('清空数据失败:', error);
+                    return false;
+                }
+            }
+        };
+        
+        // API服务模块（使用本地存储）
+        const apiService = {
+            async getAppointments() {
+                try {
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                    const data = storageService.loadData();
+                    return data.appointments || [];
+                } catch (error) {
+                    console.error('获取预约出错:', error);
+                    return [];
+                }
+            },
+            
+            async createAppointment(appointment) {
+                try {
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                    
+                    const newAppointment = {
+                        id: Date.now(),
+                        ...appointment,
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString()
+                    };
+                    
+                    const data = storageService.loadData();
+                    data.appointments = data.appointments || [];
+                    data.appointments.push(newAppointment);
+                    storageService.saveData(data);
+                    
+                    return newAppointment;
+                } catch (error) {
+                    console.error('创建预约出错:', error);
+                    throw error;
+                }
+            },
+            
+            async updateAppointment(id, appointment) {
+                try {
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                    
+                    const data = storageService.loadData();
+                    const index = data.appointments.findIndex(app => app.id === id);
+                    
+                    if (index === -1) {
+                        throw new Error('预约不存在');
+                    }
+                    
+                    const updatedAppointment = {
+                        ...data.appointments[index],
+                        ...appointment,
+                        updatedAt: new Date().toISOString()
+                    };
+                    
+                    data.appointments[index] = updatedAppointment;
+                    storageService.saveData(data);
+                    
+                    return updatedAppointment;
+                } catch (error) {
+                    console.error('更新预约出错:', error);
+                    throw error;
+                }
+            },
+            
+            async deleteAppointment(id) {
+                try {
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                    
+                    const data = storageService.loadData();
+                    data.appointments = data.appointments.filter(app => app.id !== id);
+                    storageService.saveData(data);
+                    
+                    return { success: true };
+                } catch (error) {
+                    console.error('删除预约出错:', error);
+                    throw error;
+                }
+            },
+            
+            async getStatus() {
+                try {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    
+                    const data = storageService.loadData();
+                    const appointments = data.appointments || [];
+                    
+                    const now = new Date();
+                    const currentHour = now.getHours();
+                    const currentDate = formatDate(now);
+                    
+                    const currentAppointment = appointments.find(app => {
+                        if (app.date !== currentDate) return false;
+                        
+                        const startHour = parseInt(app.startTime.split(':')[0]);
+                        const endHour = parseInt(app.endTime.split(':')[0]);
+                        
+                        return currentHour >= startHour && currentHour < endHour;
+                    });
+                    
+                    if (currentAppointment) {
+                        return {
+                            available: false,
+                            currentUser: currentAppointment.user,
+                            nextAvailableTime: currentAppointment.endTime
+                        };
+                    } else {
+                        return {
+                            available: true,
+                            currentUser: null,
+                            nextAvailableTime: '现在'
+                        };
+                    }
+                } catch (error) {
+                    console.error('获取状态出错:', error);
+                    return {
+                        available: true,
+                        currentUser: null,
+                        nextAvailableTime: '现在'
+                    };
+                }
+            }
+        };
+        
+        // 生成时间选择器选项（10分钟间隔）
+        function generateTimeOptions() {
+            const startTimeSelect = document.getElementById('start-time');
+            const endTimeSelect = document.getElementById('end-time');
+            
+            if (!startTimeSelect || !endTimeSelect) return;
+            
+            // 清空现有选项
+            startTimeSelect.innerHTML = '';
+            endTimeSelect.innerHTML = '';
+            
+            // 生成10分钟间隔的时间选项
+            for (let hour = 0; hour < 24; hour++) {
+                for (let minute = 0; minute < 60; minute += 10) {
+                    const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+                    
+                    // 添加开始时间选项
+                    const startOption = document.createElement('option');
+                    startOption.value = timeString;
+                    startOption.textContent = timeString;
+                    startTimeSelect.appendChild(startOption);
+                    
+                    // 添加结束时间选项（从08:10开始）
+                    if (!(hour === 24 && minute === 0)) {
+                        const endOption = document.createElement('option');
+                        endOption.value = timeString;
+                        endOption.textContent = timeString;
+                        endTimeSelect.appendChild(endOption);
+                    }
+                }
+            }
+        }
+        
+        // 生成用户选择器选项
+        function generateUserOptions() {
+            const selectElement = document.getElementById('user-name');
+            if (!selectElement) return;
+            
+            selectElement.innerHTML = '';
+            
+            const users = userManager.getUsers();
+            users.forEach(user => {
+                const option = document.createElement('option');
+                option.value = user;
+                option.textContent = user;
+                selectElement.appendChild(option);
+            });
+        }
+        
+        // 生成用户时间段
+        function generateUserTimeSlots() {
+            const container = document.getElementById('employee-time-slots');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            const currentDateAppointments = appointments.filter(app => 
+                app.date === formatDate(currentDate)
+            );
+            
+            // 定义两个充电桩
+            const chargingStations = [
+                { id: 'byd', name: '比亚迪充电桩', color: '#f97316' },
+                { id: 'leap', name: '零跑充电桩', color: '#22c55e' }
+            ];
+            
+            // 生成时间轴头部（24小时制）
+            const timelineHeader = document.createElement('div');
+            timelineHeader.className = 'flex items-center mb-4 pb-2 border-b border-gray-200';
+            timelineHeader.innerHTML = `
+                <div class="w-24 flex-shrink-0"></div>
+                <div class="flex-1 flex justify-between text-xs text-secondary">
+                    <span>00:00</span>
+                    <span>04:00</span>
+                    <span>08:00</span>
+                    <span>12:00</span>
+                    <span>16:00</span>
+                    <span>20:00</span>
+                    <span>24:00</span>
+                </div>
+            `;
+            container.appendChild(timelineHeader);
+            
+            // 创建可滑动的容器
+            const scrollableContainer = document.createElement('div');
+            scrollableContainer.className = 'overflow-x-auto scrollbar-hide';
+            scrollableContainer.style.maxHeight = '400px';
+            
+            const contentWrapper = document.createElement('div');
+            contentWrapper.className = 'min-w-full';
+            
+            chargingStations.forEach(station => {
+                const stationAppointments = currentDateAppointments.filter(app => app.station === station.id);
+                
+                const row = document.createElement('div');
+                row.className = 'flex items-center mb-6';
+                
+                // 充电桩名称
+                const nameCell = document.createElement('div');
+                nameCell.className = 'w-24 flex-shrink-0 text-sm font-light text-secondary pr-4';
+                nameCell.textContent = station.name;
+                row.appendChild(nameCell);
+                
+                // 进度条容器
+                const progressContainer = document.createElement('div');
+                progressContainer.className = 'flex-1 h-16 bg-gray-50 rounded-lg relative overflow-hidden';
+                progressContainer.style.minWidth = '600px'; // 确保有足够的宽度可以滑动
+                
+                // 生成时间刻度背景（24小时制）
+                const majorHours = [0, 4, 8, 12, 16, 20, 24];
+                majorHours.forEach(hour => {
+                    const tick = document.createElement('div');
+                    tick.className = 'absolute top-0 bottom-0 w-px bg-gray-300';
+                    tick.style.left = `${(hour / 24) * 100}%`;
+                    progressContainer.appendChild(tick);
+                });
+                
+                // 添加预约进度条
+                stationAppointments.forEach(appointment => {
+                    const startPercent = calculateTimePercent(appointment.startTime);
+                    const endPercent = calculateTimePercent(appointment.endTime);
+                    const duration = endPercent - startPercent;
+                    
+                    const progressBar = document.createElement('div');
+                    progressBar.className = 'absolute top-2 bottom-2 rounded-md cursor-pointer transition-all-300';
+                    progressBar.style.backgroundColor = station.color;
+                    progressBar.style.left = `${startPercent}%`;
+                    progressBar.style.width = `${duration}%`;
+                    
+                    // 添加预约信息标签
+                    const label = document.createElement('div');
+                    label.className = 'absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-xs font-medium whitespace-nowrap';
+                    label.textContent = `${appointment.user} ${appointment.startTime}-${appointment.endTime}`;
+                    progressBar.appendChild(label);
+                    
+                    // 绑定点击事件
+                    progressBar.addEventListener('click', () => {
+                        showEditModal(appointment.id);
+                    });
+                    
+                    progressContainer.appendChild(progressBar);
+                });
+                
+                // 添加可用时间段点击区域
+                progressContainer.addEventListener('click', (e) => {
+                    // 如果点击的是已有预约，不触发新预约
+                    if (e.target.closest('.absolute.top-2')) return;
+                    
+                    const rect = progressContainer.getBoundingClientRect();
+                    const clickX = e.clientX - rect.left;
+                    const percent = (clickX / rect.width) * 100;
+                    const time = calculatePercentTime(percent);
+                    
+                    showAddModal(null, time, station.id);
+                });
+                
+                row.appendChild(progressContainer);
+                contentWrapper.appendChild(row);
+            });
+            
+            scrollableContainer.appendChild(contentWrapper);
+            container.appendChild(scrollableContainer);
+        }
+        
+        // 计算时间对应的百分比位置
+        function calculateTimePercent(timeString) {
+            const [hours, minutes] = timeString.split(':').map(Number);
+            const totalMinutes = (hours - 8) * 60 + minutes;
+            const totalWorkingMinutes = 14 * 60; // 8:00 - 22:00 = 14小时
+            return (totalMinutes / totalWorkingMinutes) * 100;
+        }
+        
+        // 根据百分比计算时间
+        function calculatePercentTime(percent) {
+            const totalWorkingMinutes = 14 * 60; // 8:00 - 22:00 = 14小时
+            const totalMinutes = (percent / 100) * totalWorkingMinutes;
+            const hours = Math.floor(totalMinutes / 60) + 8;
+            const minutes = Math.round(totalMinutes % 60 / 10) * 10; // 四舍五入到最近的10分钟
+            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+        }
+        
+        // 绑定时间段点击事件
+
+        
+        // 渲染预约列表
+        function renderAppointmentList() {
+            const appointmentList = document.getElementById('appointment-list');
+            if (!appointmentList) return;
+            
+            const filteredAppointments = appointments.filter(app => {
+                return app.date === formatDate(currentDate);
+            });
+            
+            filteredAppointments.sort((a, b) => {
+                if (a.startTime !== b.startTime) {
+                    return a.startTime.localeCompare(b.startTime);
+                }
+                return a.user.localeCompare(b.user);
+            });
+            
+            appointmentList.innerHTML = '';
+            
+            if (filteredAppointments.length === 0) {
+                appointmentList.innerHTML = `
+                    <div class="text-center py-16 text-secondary">
+                        <i class="fa fa-calendar-o text-5xl mb-6"></i>
+                        <p class="text-xl">今日暂无预约</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            filteredAppointments.forEach(appointment => {
+                const appointmentElement = document.createElement('div');
+                appointmentElement.className = 'appointment-card flex justify-between items-center p-6 glass-effect rounded-lg shadow-card';
+                appointmentElement.innerHTML = `
+                    <div class="flex items-center">
+                        <div class="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center mr-6">
+                            <i class="fa fa-user text-primary text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-xl font-light">${appointment.user}</p>
+                            <p class="text-sm text-secondary">${appointment.startTime} - ${appointment.endTime}</p>
+                        </div>
+                    </div>
+                    <div class="flex space-x-4">
+                        <button class="edit-appointment p-4 rounded-full hover:bg-gray-100 transition-all-300" data-id="${appointment.id}">
+                            <i class="fa fa-pencil text-primary"></i>
+                        </button>
+                        <button class="delete-appointment p-4 rounded-full hover:bg-gray-100 transition-all-300" data-id="${appointment.id}">
+                            <i class="fa fa-trash text-secondary"></i>
+                        </button>
+                    </div>
+                `;
+                
+                appointmentList.appendChild(appointmentElement);
+            });
+            
+            document.querySelectorAll('.edit-appointment').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = parseInt(this.getAttribute('data-id'));
+                    editAppointment(id);
+                });
+            });
+            
+            document.querySelectorAll('.delete-appointment').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = parseInt(this.getAttribute('data-id'));
+                    deleteAppointment(id);
+                });
+            });
+            
+            // 绑定刷新统计按钮事件
+            const refreshStatsBtn = document.getElementById('refresh-stats-btn');
+            if (refreshStatsBtn) {
+                refreshStatsBtn.addEventListener('click', () => {
+                    renderStats();
+                    showNotification('统计数据已刷新');
+                });
+            }
+            
+            // 绑定用户管理按钮事件
+            const manageUsersBtn = document.getElementById('manage-users-btn');
+            if (manageUsersBtn) {
+                manageUsersBtn.addEventListener('click', () => {
+                    showUserManagementModal();
+                });
+            }
+            
+            // 绑定添加用户按钮事件
+            const addUserBtn = document.getElementById('add-user-btn');
+            if (addUserBtn) {
+                addUserBtn.addEventListener('click', () => {
+                    const newUserName = document.getElementById('new-user-name').value.trim();
+                    if (newUserName) {
+                        if (userManager.addUser(newUserName)) {
+                            showNotification(`用户"${newUserName}"已添加`);
+                            document.getElementById('new-user-name').value = '';
+                            renderUserManagement();
+                            generateUserOptions();
+                            generateUserTimeSlots();
+                            renderStats();
+                        } else {
+                            showNotification('用户已存在', 'error');
+                        }
+                    } else {
+                        showNotification('请输入用户名', 'error');
+                    }
+                });
+            }
+            
+            // 绑定模态框关闭按钮事件
+            const closeUserManagementBtn = document.getElementById('close-user-management');
+            if (closeUserManagementBtn) {
+                closeUserManagementBtn.addEventListener('click', () => {
+                    hideUserManagementModal();
+                });
+            }
+            
+            const closeUserManagementModalBtn = document.getElementById('close-user-management-modal');
+            if (closeUserManagementModalBtn) {
+                closeUserManagementModalBtn.addEventListener('click', () => {
+                    hideUserManagementModal();
+                });
+            }
+        }
+        
+        // 更新充电桩状态
+        async function updateStatus() {
+            try {
+                const status = await apiService.getStatus();
+                const statusIndicator = document.getElementById('status-indicator');
+                const statusText = document.getElementById('status-text');
+                const nextAvailableTime = document.getElementById('next-available-time');
+                
+                if (status.available) {
+                    statusIndicator.className = 'w-5 h-5 rounded-full bg-success mr-4 status-pulse';
+                    statusText.textContent = '当前可用';
+                    statusText.className = 'text-2xl font-light text-success';
+                    nextAvailableTime.textContent = '现在';
+                } else {
+                    statusIndicator.className = 'w-5 h-5 rounded-full bg-accent mr-4 status-pulse occupied';
+                    statusText.textContent = `被${status.currentUser}占用`;
+                    statusText.className = 'text-2xl font-light text-accent';
+                    nextAvailableTime.textContent = status.nextAvailableTime;
+                }
+            } catch (error) {
+                console.error('更新状态失败:', error);
+            }
+        }
+        
+        // 更新日期显示
+        function updateDateDisplay() {
+            const dateElement = document.getElementById('current-date');
+            if (!dateElement) return;
+            
+            // 使用实时时间
+            const now = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+            dateElement.textContent = now.toLocaleDateString('zh-CN', options);
+            
+            // 同时更新currentDate为当前时间
+            currentDate = now;
+        }
+        
+        // 打开添加预约模态框
+        function openAddModal(user = null, time = null, station = null) {
+            document.getElementById('modal-title').textContent = '添加预约';
+            document.getElementById('appointment-id').value = '';
+            document.getElementById('appointment-form').reset();
+            document.getElementById('appointment-date').value = formatDate(currentDate);
+            
+            if (user) document.getElementById('user-name').value = user;
+            if (time) document.getElementById('start-time').value = time;
+            if (station) document.getElementById('charging-station').value = station;
+            
+            openModal();
+        }
+        
+        // 打开快速添加预约模态框
+        function openQuickAddModal(user, time) {
+            document.getElementById('modal-title').textContent = '添加预约';
+            document.getElementById('appointment-id').value = '';
+            document.getElementById('user-name').value = user;
+            document.getElementById('start-time').value = time;
+            
+            const startHour = parseInt(time.split(':')[0]);
+            const endHour = startHour + 2;
+            if (endHour <= 22) {
+                document.getElementById('end-time').value = `${String(endHour).padStart(2, '0')}:00`;
+            } else {
+                document.getElementById('end-time').value = '22:00';
+            }
+            
+            document.getElementById('appointment-date').value = formatDate(currentDate);
+            
+            openModal();
+        }
+        
+        // 打开编辑预约模态框
+        function editAppointment(id) {
+            const appointment = appointments.find(app => app.id === id);
+            if (!appointment) return;
+            
+            document.getElementById('modal-title').textContent = '编辑预约';
+            document.getElementById('appointment-id').value = appointment.id;
+            document.getElementById('user-name').value = appointment.user;
+            document.getElementById('appointment-date').value = appointment.date;
+            document.getElementById('start-time').value = appointment.startTime;
+            document.getElementById('end-time').value = appointment.endTime;
+            
+            openModal();
+        }
+        
+        // 删除预约
+        async function deleteAppointment(id) {
+            if (confirm('确定要删除这个预约吗？')) {
+                try {
+                    await apiService.deleteAppointment(id);
+                    
+                    const index = appointments.findIndex(app => app.id === id);
+                    if (index !== -1) {
+                        appointments.splice(index, 1);
+                    }
+                    
+                    renderAppointmentList();
+                    generateUserTimeSlots();
+                    await updateStatus();
+                    
+                    lastUpdated = Date.now();
+                    
+                    showNotification('预约已删除');
+                } catch (error) {
+                    console.error('删除预约失败:', error);
+                    showNotification('删除预约失败，请重试', 'error');
+                }
+            }
+        }
+        
+        // 保存预约
+        async function saveAppointment(e) {
+            e.preventDefault();
+            
+            const id = document.getElementById('appointment-id').value;
+            const user = document.getElementById('user-name').value;
+            const date = document.getElementById('appointment-date').value;
+            const startTime = document.getElementById('start-time').value;
+            const endTime = document.getElementById('end-time').value;
+            const station = document.getElementById('charging-station').value;
+            
+            const hasConflict = checkConflict(user, date, startTime, endTime, id, station);
+            
+            if (hasConflict) {
+                showConflictModal(user, date, startTime, endTime);
+                return;
+            }
+            
+            try {
+                let updatedAppointment;
+                
+                if (id) {
+                    updatedAppointment = await apiService.updateAppointment(parseInt(id), {
+                        user, date, startTime, endTime, station
+                    });
+                    
+                    const index = appointments.findIndex(app => app.id === parseInt(id));
+                    if (index !== -1) {
+                        appointments[index] = updatedAppointment;
+                    }
+                    
+                    showNotification('预约已更新');
+                } else {
+                    updatedAppointment = await apiService.createAppointment({
+                        user, date, startTime, endTime, station
+                    });
+                    
+                    appointments.push(updatedAppointment);
+                    
+                    showNotification('预约创建成功');
+                }
+                
+                renderAppointmentList();
+                generateUserTimeSlots();
+                await updateStatus();
+                
+                lastUpdated = Date.now();
+                
+                closeModal();
+            } catch (error) {
+                console.error('保存预约失败:', error);
+                showNotification('保存预约失败，请重试', 'error');
+            }
+        }
+        
+        // 检查时间冲突
+        function checkConflict(user, date, startTime, endTime, id, station) {
+            return appointments.some(app => {
+                if (id && app.id === parseInt(id)) return false;
+                if (app.date !== date) return false;
+                if (app.station !== station) return false; // 只检查同一充电桩的冲突
+                return (startTime < app.endTime && endTime > app.startTime);
+            });
+        }
+        
+        // 显示冲突提醒模态框
+        function showConflictModal(user, date, startTime, endTime) {
+            const availableSlots = findAvailableSlots(user, date);
+            
+            const slotsContainer = document.getElementById('available-slots');
+            slotsContainer.innerHTML = '';
+            
+            if (availableSlots.length > 0) {
+                availableSlots.forEach(slot => {
+                    const slotElement = document.createElement('div');
+                    slotElement.className = 'p-4 bg-success/10 border border-success/20 text-success rounded-lg text-center cursor-pointer hover:bg-success/15 transition-all-300';
+                    slotElement.textContent = `${slot.startTime} - ${slot.endTime}`;
+                    
+                    slotElement.addEventListener('click', function() {
+                        document.getElementById('start-time').value = slot.startTime;
+                        document.getElementById('end-time').value = slot.endTime;
+                        closeConflictModal();
+                    });
+                    
+                    slotsContainer.appendChild(slotElement);
+                });
+            } else {
+                slotsContainer.innerHTML = '<p class="text-secondary">抱歉，当天没有可用时间段</p>';
+            }
+            
+            const modal = document.getElementById('conflict-modal');
+            const modalContent = document.getElementById('conflict-modal-content');
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modalContent.classList.remove('scale-95', 'opacity-0');
+                modalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+        
+        // 查找可用时间段
+        function findAvailableSlots(user, date) {
+            const availableSlots = [];
+            const station = document.getElementById('charging-station').value;
+            
+            // 获取当前充电桩的已预约时段
+            const bookedSlots = appointments
+                .filter(app => app.date === date && app.station === station)
+                .map(app => ({ start: app.startTime, end: app.endTime }));
+            
+            // 生成10分钟间隔的时间槽
+            const timeSlots = [];
+            for (let hour = 8; hour < 22; hour++) {
+                for (let minute = 0; minute < 60; minute += 10) {
+                    const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+                    timeSlots.push(timeString);
+                }
+            }
+            
+            // 查找连续可用的时间段（至少30分钟）
+            let currentAvailableStart = null;
+            
+            for (let i = 0; i < timeSlots.length - 1; i++) {
+                const currentSlot = timeSlots[i];
+                const nextSlot = timeSlots[i + 1];
+                
+                const isAvailable = !bookedSlots.some(slot => {
+                    return (currentSlot < slot.end && nextSlot > slot.start);
+                });
+                
+                if (isAvailable) {
+                    if (!currentAvailableStart) {
+                        currentAvailableStart = currentSlot;
+                    }
+                } else {
+                    if (currentAvailableStart) {
+                        // 计算可用时长
+                        const startHour = parseInt(currentAvailableStart.split(':')[0]);
+                        const startMinute = parseInt(currentAvailableStart.split(':')[1]);
+                        const endHour = parseInt(currentSlot.split(':')[0]);
+                        const endMinute = parseInt(currentSlot.split(':')[1]);
+                        const durationMinutes = (endHour - startHour) * 60 + (endMinute - startMinute);
+                        
+                        // 只添加至少30分钟的可用时段
+                        if (durationMinutes >= 30) {
+                            availableSlots.push({ 
+                                startTime: currentAvailableStart, 
+                                endTime: currentSlot 
+                            });
+                        }
+                        currentAvailableStart = null;
+                    }
+                }
+            }
+            
+            // 处理最后一个可用时段
+            if (currentAvailableStart) {
+                const startHour = parseInt(currentAvailableStart.split(':')[0]);
+                const startMinute = parseInt(currentAvailableStart.split(':')[1]);
+                const endHour = 22;
+                const endMinute = 0;
+                const durationMinutes = (endHour - startHour) * 60 + (endMinute - startMinute);
+                
+                if (durationMinutes >= 30) {
+                    availableSlots.push({ 
+                        startTime: currentAvailableStart, 
+                        endTime: '22:00' 
+                    });
+                }
+            }
+            
+            return availableSlots;
+        }
+        
+        // 打开模态框
+        function openModal() {
+            const modal = document.getElementById('appointment-modal');
+            const modalContent = document.getElementById('modal-content');
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modalContent.classList.remove('scale-95', 'opacity-0');
+                modalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+        
+        // 关闭模态框
+        function closeModal() {
+            const modal = document.getElementById('appointment-modal');
+            const modalContent = document.getElementById('modal-content');
+            
+            modalContent.classList.remove('scale-100', 'opacity-100');
+            modalContent.classList.add('scale-95', 'opacity-0');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+        
+        // 关闭冲突提醒模态框
+        function closeConflictModal() {
+            const modal = document.getElementById('conflict-modal');
+            const modalContent = document.getElementById('conflict-modal-content');
+            
+            modalContent.classList.remove('scale-100', 'opacity-100');
+            modalContent.classList.add('scale-95', 'opacity-0');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+        
+        // 显示通知
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const icon = document.getElementById('notification-icon');
+            const messageElement = document.getElementById('notification-message');
+            
+            messageElement.textContent = message;
+            
+            if (type === 'error') {
+                icon.className = 'fa fa-exclamation-circle mr-4 text-red-500';
+            } else {
+                icon.className = 'fa fa-check-circle mr-4 text-success';
+            }
+            
+            notification.classList.remove('translate-x-full', 'opacity-0');
+            
+            setTimeout(() => {
+                notification.classList.add('translate-x-full', 'opacity-0');
+            }, 3000);
+        }
+        
+        // 显示用户管理模态框
+        function showUserManagementModal() {
+            const modal = document.getElementById('user-management-modal');
+            const content = document.getElementById('user-management-content');
+            
+            if (!modal || !content) return;
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+            
+            renderUserManagement();
+        }
+        
+        // 隐藏用户管理模态框
+        function hideUserManagementModal() {
+            const modal = document.getElementById('user-management-modal');
+            const content = document.getElementById('user-management-content');
+            
+            if (!modal || !content) return;
+            
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+        
+        // 格式化日期为YYYY-MM-DD
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        
+        // 渲染充电记录统计
+        function renderStats() {
+            const container = document.getElementById('stats-container');
+            if (!container) return;
+            
+            const stats = userManager.getUserStats();
+            const users = userManager.getUsers();
+            
+            // 计算总体统计
+            const totalAppointments = Object.values(stats).reduce((sum, user) => sum + user.total, 0);
+            const totalDuration = Object.values(stats).reduce((sum, user) => sum + user.duration, 0);
+            
+            container.innerHTML = `
+                <!-- 总体统计 -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="glass-effect p-6 rounded-lg shadow-card">
+                        <p class="text-secondary mb-2">总预约次数</p>
+                        <p class="text-3xl font-light">${totalAppointments}</p>
+                    </div>
+                    <div class="glass-effect p-6 rounded-lg shadow-card">
+                        <p class="text-secondary mb-2">总充电时长</p>
+                        <p class="text-3xl font-light">${totalDuration}小时</p>
+                    </div>
+                    <div class="glass-effect p-6 rounded-lg shadow-card">
+                        <p class="text-secondary mb-2">活跃用户</p>
+                        <p class="text-3xl font-light">${Object.keys(stats).length}</p>
+                    </div>
+                </div>
+                
+                <!-- 用户统计列表 -->
+                <div class="space-y-4">
+                    <h3 class="text-xl font-light mb-4">用户充电记录</h3>
+                    <div id="user-stats-list" class="space-y-3">
+                        <!-- 用户统计将在这里动态生成 -->
+                    </div>
+                </div>
+            `;
+            
+            // 渲染用户统计列表
+            const userStatsList = document.getElementById('user-stats-list');
+            if (userStatsList) {
+                if (users.length === 0) {
+                    userStatsList.innerHTML = '<p class="text-secondary text-center py-8">暂无用户数据</p>';
+                } else {
+                    users.forEach(user => {
+                        const userStat = stats[user] || { total: 0, duration: 0, lastUsed: null };
+                        const userElement = document.createElement('div');
+                        userElement.className = 'glass-effect p-5 rounded-lg shadow-card';
+                        userElement.innerHTML = `
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="text-lg font-light">${user}</p>
+                                    <div class="flex items-center space-x-6 mt-2">
+                                        <span class="text-sm text-secondary">预约${userStat.total}次</span>
+                                        <span class="text-sm text-secondary">共计${userStat.duration}小时</span>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    ${userStat.lastUsed ? `<p class="text-sm text-secondary">最后使用</p><p class="text-sm">${formatDateDisplay(userStat.lastUsed)}</p>` : '<p class="text-sm text-secondary">从未使用</p>'}
+                                </div>
+                            </div>
+                        `;
+                        userStatsList.appendChild(userElement);
+                    });
+                }
+            }
+        }
+        
+        // 渲染用户管理列表
+        function renderUserManagement() {
+            const userList = document.getElementById('user-list');
+            if (!userList) return;
+            
+            const users = userManager.getUsers();
+            
+            userList.innerHTML = '';
+            
+            users.forEach(user => {
+                const userElement = document.createElement('div');
+                userElement.className = 'flex justify-between items-center p-4 bg-gray-50 rounded-lg';
+                userElement.innerHTML = `
+                    <span class="font-light">${user}</span>
+                    ${['比亚迪', '零跑', '员工'].includes(user) ? `
+                        <span class="text-xs text-secondary">(默认用户，不可删除)</span>
+                    ` : `
+                        <button class="delete-user-btn p-2 rounded-full hover:bg-gray-200 transition-all-300" data-user="${user}">
+                            <i class="fa fa-trash text-secondary"></i>
+                        </button>
+                    `}
+                `;
+                userList.appendChild(userElement);
+            });
+            
+            // 绑定删除用户按钮事件
+            document.querySelectorAll('.delete-user-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const user = this.getAttribute('data-user');
+                    if (confirm(`确定要删除用户"${user}"吗？`)) {
+                        if (userManager.removeUser(user)) {
+                            showNotification(`用户"${user}"已删除`);
+                            renderUserManagement();
+                            generateUserOptions();
+                            generateUserTimeSlots();
+                            renderStats();
+                        } else {
+                            showNotification('删除用户失败', 'error');
+                        }
+                    }
+                });
+            });
+        }
+        
+        // 格式化日期显示
+        function formatDateDisplay(dateString) {
+            const date = new Date(dateString);
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return date.toLocaleDateString('zh-CN', options);
+        }
+        
+        // 初始化应用
+        async function initApp() {
+            try {
+                // 初始化时就设置为当前时间
+                currentDate = new Date();
+                
+                const data = await apiService.getAppointments();
+                appointments = data;
+                
+                generateUserOptions();
+                generateTimeOptions();
+                generateUserTimeSlots();
+                renderAppointmentList();
+                updateStatus();
+                updateDateDisplay();
+                renderStats();
+                
+                typingEffect(
+                    document.getElementById('typing-text'),
+                    ['预约系统', '智能管理', '高效便捷'],
+                    100,
+                    2000
+                );
+                
+                setupCustomCursor();
+                setupScrollParallax();
+                setupScrollReveal();
+                
+            } catch (error) {
+                console.error('初始化应用失败:', error);
+                showNotification('初始化失败，请刷新页面重试', 'error');
+            }
+        }
+        
+        // 事件监听器
+        document.addEventListener('DOMContentLoaded', () => {
+            // 日期导航按钮
+            document.getElementById('prev-day').addEventListener('click', () => {
+                currentDate.setDate(currentDate.getDate() - 1);
+                updateDateDisplay();
+                renderAppointmentList();
+                generateUserTimeSlots();
+            });
+            
+            document.getElementById('next-day').addEventListener('click', () => {
+                currentDate.setDate(currentDate.getDate() + 1);
+                updateDateDisplay();
+                renderAppointmentList();
+                generateUserTimeSlots();
+            });
+            
+            // 添加预约按钮
+            document.getElementById('add-appointment-btn').addEventListener('click', openAddModal);
+            
+            // 模态框关闭按钮
+            document.getElementById('close-modal').addEventListener('click', closeModal);
+            document.getElementById('cancel-appointment').addEventListener('click', closeModal);
+            
+            // 冲突模态框关闭按钮
+            document.getElementById('close-conflict-modal').addEventListener('click', closeConflictModal);
+            document.getElementById('close-conflict').addEventListener('click', closeConflictModal);
+            
+            // 预约表单提交
+            document.getElementById('appointment-form').addEventListener('submit', saveAppointment);
+            
+            // 点击模态框背景关闭
+            document.getElementById('appointment-modal').addEventListener('click', (e) => {
+                if (e.target.id === 'appointment-modal') {
+                    closeModal();
+                }
+            });
+            
+            document.getElementById('conflict-modal').addEventListener('click', (e) => {
+                if (e.target.id === 'conflict-modal') {
+                    closeConflictModal();
+                }
+            });
+            
+            // 初始化应用
+            initApp();
+        });
+    </script>
+
+</body></html>
