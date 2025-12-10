@@ -287,19 +287,20 @@
     <!-- 第一屏：头部和状态概览 -->
     <section id="screen3" class="screen relative min-h-screen bg-white z-5">
         <div class="relative z-5 min-h-screen px-4 md:px-8">
-            <div class="max-w-6xl mx-12">
+            <div class="relative z-10 min-h-screen px-4 md:px-8">
+            <div class="max-w-6xl mx-auto">
                 <!-- 顶部标题区域 -->
                 <header class="mb-16 pt-16">
                     <div class="flex flex-col items-center text-center mb-12">
-                        <h1 class="text-3xl md:text-4xl font-light mb-3">
+                        <h1 class="text-6xl md:text-8xl font-light mb-6">
                             充电桩
                             <span id="typing-text" class="typing ml-3" style="font-size: 12px;">预约系统</span>
                         </h1>
-                        <div class="line-element h-px w-12 bg-black mb-6"></div>
+                        <div class="line-element h-px w-32 bg-black mb-6"></div>
                         <p></p>
                     </div>
-                </header>
-                
+                </header
+               
                 <!-- 充电桩状态概览卡片 -->
                 <div class="glass-effect rounded-xl p-8 mb-8 hover-scale fade-in shadow-card">
                     <div class="flex flex-col md:flex-row justify-between items-center">
@@ -325,7 +326,16 @@
                         <i class="fa fa-chevron-right text-primary"></i>
                     </button>
                 </div>
-   </div></section>
+                <!-- 时间段选择器 -->
+                <div class="glass-effect rounded-xl p-8 mb-16 fade-in shadow-card" style="transition-delay: 0.3s;">
+                    <h2 class="text-3xl font-light mb-10">预约时间表</h2>
+                                                                        
+                                <!-- 时间段行 - 员工列表 -->
+                                <div id="employee-time-slots">
+                                    <!-- 员工时间段将通过JS动态生成 -->
+                                </div>
+                            </div>
+   </section>
     
     <!-- 第二屏：日期选择和时间段 -->
     <section id="screen2" class="screen relative min-h-screen bg-gray-lighter z-5">
