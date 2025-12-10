@@ -1,63 +1,62 @@
-
- 
+<html lang="zh-CN"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>文昌水投充电桩预约</title>
-    
+    <!-- Tailwind CSS v3 -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <链接 链接="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="样式表">
-    
-    <脚本>
-        尾风.配置 = {
-            主题：{
-                扩展：{
-                    颜色：{
-                        主要：'#000000'，
-                        次要的：'#666666'，
-                         accent  :  '#f97316'  , 
-                        成功：'#22c55e'，
-                        白色：'#ffffff'，
-                        'gray-light'：'#f5f5f5'，
-                        '灰白色'：'#fafafa'，
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- 统一的 Tailwind 配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#000000',
+                        secondary: '#666666',
+                        accent: '#f97316',
+                        success: '#22c55e',
+                        white: '#ffffff',
+                        'gray-light': '#f5f5f5',
+                        'gray-lighter': '#fafafa',
                     },
-                    字体家族：{
-                        无衬线：['Inter'，'system-ui'，'sans-serif']，
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
                     },
-                    boxShadow：{
+                    boxShadow: {
                         'card': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
                         'card-hover': '0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04)',
                     }
                 }
             }
         }
-    </脚本>
-    <样式 类型="text/tailwindcss">
-        @层 工具 {
-            玻璃效果 {
-                背景: rgba(255, 255, 255, 0.95);
-                背景过滤器：模糊(10px);
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .glass-effect {
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(10px);
                 -webkit-backdrop-filter: blur(10px);
-                边框：1px solid rgba(0, 0, 0, 0.05);
+                border: 1px solid rgba(0, 0, 0, 0.05);
             }
-            transition-all-300 {
-                过渡：所有属性 0.3秒 ease;
+            .transition-all-300 {
+                transition: all 0.3s ease;
             }
             .scrollbar-hide::-webkit-scrollbar {
-                显示：无；
+                display: none;
             }
             .scrollbar-hide {
                 -ms-overflow-style: none;
-                滚动条宽度：无；
+                scrollbar-width: none;
             }
             .text-shadow {
                 text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             }
-            悬停缩放 {
-                过渡：变换 0.3 秒 ease;
+            .hover-scale {
+                transition: transform 0.3s ease;
             }
             .hover-scale:hover {
-                变换: 缩放(1.02);
+                transform: scale(1.02);
             }
         }
     </style>
@@ -287,8 +286,8 @@
     
     <!-- 第一屏：头部和状态概览 -->
     <section id="screen3" class="screen relative min-h-screen bg-white z-5">
-        <div class="relative z-5 min-h-screen px-4 md:px-8">
-            <div class="relative z-10 min-h-screen px-4 md:px-8">
+        <div class="relative z-5 min-h-screen px-4 md:px-8 py-8">
+            <div class="relative z-10 min-h-screen px-2 md:px-4">
             <div class="max-w-6xl mx-auto">
                 <!-- 顶部标题区域 -->
                 <header class="mb-16 pt-16">
