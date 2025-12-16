@@ -539,7 +539,7 @@
             // 添加用户
             addUser(userName) {
                 const data = storageService.loadData();
-                data.users = data.users || ['默认用户'];
+                data.users = data.users || ['比亚迪', '零跑', '员工'];
                 
                 if (!data.users.includes(userName)) {
                     data.users.push(userName);
@@ -1048,19 +1048,19 @@
             container.appendChild(scrollableContainer);
         }
         
-        // 计算时间对应的百分比位置
+        // 计算时间对应的百分比位置（24小时制）
         function calculateTimePercent(timeString) {
             const [hours, minutes] = timeString.split(':').map(Number);
-            const totalMinutes = (hours - 8) * 60 + minutes;
-            const totalWorkingMinutes = 14 * 60; // 8:00 - 22:00 = 14小时
+            const totalMinutes = hours * 60 + minutes;
+            const totalWorkingMinutes = 24 * 60; // 24小时
             return (totalMinutes / totalWorkingMinutes) * 100;
         }
         
-        // 根据百分比计算时间
+        // 根据百分比计算时间（24小时制）
         function calculatePercentTime(percent) {
-            const totalWorkingMinutes = 14 * 60; // 8:00 - 22:00 = 14小时
+            const totalWorkingMinutes = 24 * 60; // 24小时
             const totalMinutes = (percent / 100) * totalWorkingMinutes;
-            const hours = Math.floor(totalMinutes / 60) + 8;
+            const hours = Math.floor(totalMinutes / 60);
             const minutes = Math.round(totalMinutes % 60 / 10) * 10; // 四舍五入到最近的10分钟
             return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
         }
